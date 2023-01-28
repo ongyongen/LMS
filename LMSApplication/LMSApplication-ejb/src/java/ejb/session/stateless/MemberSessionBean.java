@@ -48,6 +48,4 @@ public class MemberSessionBean implements MemberSessionBeanRemote, MemberSession
         }
         
     }
-
-  
 }

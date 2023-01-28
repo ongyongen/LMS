@@ -6,6 +6,7 @@ package ejb.session.stateless;
 
 import entity.Staff;
 import exception.InvalidLoginException;
+import exception.StaffNotFoundException;
 import java.util.List;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
@@ -37,6 +38,16 @@ public class StaffSessionBean implements StaffSessionBeanRemote, StaffSessionBea
     }
     
     @Override
+    public Staff retrieveStaffById(Long staffId) throws StaffNotFoundException {
+        if (em.find(Staff.class, staffId) == null) {
+            throw new StaffNotFoundException();
+        } else {
+            Staff staff = em.find(Staff.class, staffId);
+            return staff;
+        }
+    }
+    
+    @Override
     public Staff retrieveStaffByUsernameAndPassword(String username, String password) throws InvalidLoginException {
         
         Query query = em.createQuery("SELECT s FROM Staff s "
@@ -50,6 +61,21 @@ public class StaffSessionBean implements StaffSessionBeanRemote, StaffSessionBea
         } else {
             return (Staff)query.getSingleResult();
         }
+    }
+    
+    @Override
+    public void updateStaff(Long staffId, String newFirstName, String newLastName, String newUserName, String newPassword) throws StaffNotFoundException {
+        Staff staff = this.retrieveStaffById(staffId);
+        staff.setFirstName(newFirstName);
+        staff.setLastName(newLastName);
+        staff.setUserName(newUserName);
+        staff.setPassword(newPassword);    
+    }
+    
+    @Override
+    public void deleteStaff(Long staffId) throws StaffNotFoundException {
+        Staff staff = this.retrieveStaffById(staffId);
+        em.remove(staff);
     }
     
 }

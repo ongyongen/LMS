@@ -3,8 +3,12 @@ package ejb.session.stateless;
 
 import entity.LendAndReturn;
 import exception.BookNotFoundException;
+import exception.FineNotPaidException;
 import exception.LendingNotFoundException;
 import exception.MemberNotFoundException;
+import java.math.BigDecimal;
+import java.util.Date;
+import java.util.List;
 import javax.ejb.Remote;
 
 /**
@@ -14,8 +18,20 @@ import javax.ejb.Remote;
 @Remote
 public interface LendAndReturnSessionBeanRemote {
     
-    public Long createLendAndReturnRecord(String memberIdentityNo, String bookTitle, LendAndReturn record) throws MemberNotFoundException, BookNotFoundException;
-    
+    public Long createLendingRecord(String memberIdentityNo, String bookTitle, LendAndReturn record) throws MemberNotFoundException, BookNotFoundException;    
+
     public LendAndReturn retrieveLendingRecordByIdNoAndTitle(String idNo, String title) throws LendingNotFoundException, BookNotFoundException, MemberNotFoundException;
+
+    public List<LendAndReturn> retrieveAllLendingRecords();
+
+    public LendAndReturn retrieveLendingRecordById(Long recordId) throws LendingNotFoundException;
+
+    public BigDecimal calculateFineAmount(Date currentDate, Date lendDate);
+
+    public BigDecimal retrieveFineAmountForRecord(Long recordId) throws LendingNotFoundException, BookNotFoundException, MemberNotFoundException;
+
+    public void returnBookNotLate(Long recordId, Date returnDate) throws LendingNotFoundException, BookNotFoundException, MemberNotFoundException;
+
+    public void returnBookLate(Long recordId, Date returnDate, BigDecimal finePayment) throws LendingNotFoundException, BookNotFoundException, MemberNotFoundException, FineNotPaidException;
 
 }

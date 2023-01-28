@@ -5,8 +5,10 @@ import entity.Book;
 import entity.LendAndReturn;
 import entity.Member;
 import exception.BookNotFoundException;
+import exception.FineNotPaidException;
 import exception.LendingNotFoundException;
 import exception.MemberNotFoundException;
+import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 import javax.ejb.EJB;
@@ -32,7 +34,7 @@ public class LendAndReturnSessionBean implements LendAndReturnSessionBeanRemote,
     private EntityManager em;
 
     @Override
-    public Long createLendAndReturnRecord(String memberIdentityNo, String bookTitle, LendAndReturn record) throws MemberNotFoundException, BookNotFoundException {
+    public Long createLendingRecord(String memberIdentityNo, String bookTitle, LendAndReturn record) throws MemberNotFoundException, BookNotFoundException {
         Member member = memberSessionBeanLocal.retrieveMemberByIdentityNo(memberIdentityNo);
         Book book = bookSessionBeanLocal.retrieveBookByTitle(bookTitle);
         
@@ -45,12 +47,23 @@ public class LendAndReturnSessionBean implements LendAndReturnSessionBeanRemote,
         return record.getLendId();
     }
     
+    @Override
     public List<LendAndReturn> retrieveAllLendingRecords() {
         String queryString = "SELECT record FROM LendAndReturn record";
         Query query = em.createQuery(queryString);
         return query.getResultList();   
     }
     
+    @Override
+    public LendAndReturn retrieveLendingRecordById(Long recordId) throws LendingNotFoundException {
+        if (em.find(LendAndReturn.class, recordId) == null) {
+            throw new LendingNotFoundException();
+        } else {
+            LendAndReturn record = em.find(LendAndReturn.class, recordId);
+            return record;
+        }
+    }
+
     @Override
     public LendAndReturn retrieveLendingRecordByIdNoAndTitle(String idNo, String title) throws LendingNotFoundException, BookNotFoundException, MemberNotFoundException {
         Long bookId = bookSessionBeanLocal.retrieveBookByTitle(title).getBookId();
@@ -63,11 +76,47 @@ public class LendAndReturnSessionBean implements LendAndReturnSessionBeanRemote,
         query.setParameter("bookId", bookId);
         query.setParameter("memberId", memberId);
 
-        
         if (query.getResultList().isEmpty()) {
             throw new LendingNotFoundException();
         } else {
             return (LendAndReturn)query.getSingleResult();
+        }
+    }
+
+    @Override
+    public BigDecimal calculateFineAmount(Date currentDate, Date lendDate) {
+        long diff = Math.abs(currentDate.getTime() - lendDate.getTime());
+        long days = diff / (1000*60*60*24);
+        BigDecimal fineAmount = new BigDecimal((days-14) * 0.50);        
+        return fineAmount;
+    }
+    
+    @Override
+    public BigDecimal retrieveFineAmountForRecord(Long recordId) throws LendingNotFoundException, BookNotFoundException, MemberNotFoundException {
+        LendAndReturn record = this.retrieveLendingRecordById(recordId);
+        Date currentDate = new Date();
+        Date lendDate = record.getLendDate();    
+        return calculateFineAmount(currentDate, lendDate);
+    }
+    
+    @Override
+    public void returnBookNotLate(Long recordId, Date returnDate) throws LendingNotFoundException, BookNotFoundException, MemberNotFoundException {
+        LendAndReturn record = this.retrieveLendingRecordById(recordId);
+        record.setReturnDate(returnDate);
+    }
+    
+    @Override
+    public void returnBookLate(Long recordId, Date returnDate, BigDecimal finePayment) throws LendingNotFoundException, BookNotFoundException, MemberNotFoundException, FineNotPaidException {
+        LendAndReturn record = this.retrieveLendingRecordById(recordId);
+        Date lendDate = record.getLendDate(); 
+        BigDecimal fineAmount = calculateFineAmount(returnDate, lendDate);
+        
+        if (finePayment.compareTo(fineAmount) == -1) {
+            throw new FineNotPaidException();
+        } else {
+            record.setReturnDate(returnDate);
+            record.setFineAmount(fineAmount);
+            
         }
     }
 

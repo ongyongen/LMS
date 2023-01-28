@@ -92,11 +92,11 @@ public class DataInitSessionBean {
                 LendAndReturn record4 = new LendAndReturn(date);
                 LendAndReturn record5 = new LendAndReturn(date);
 
-                lendAndReturnSessionBeanLocal.createLendAndReturnRecord("S8900678A", "Anna Karenina", record1);
-                lendAndReturnSessionBeanLocal.createLendAndReturnRecord("S8900678A", "Madame Bovary", record2);
-                lendAndReturnSessionBeanLocal.createLendAndReturnRecord("S8900678A", "Hamlet", record3);
-                lendAndReturnSessionBeanLocal.createLendAndReturnRecord("S8581028X", "The Hobbit", record4);
-                lendAndReturnSessionBeanLocal.createLendAndReturnRecord("S8581028X", "Great Expectations", record5);
+                lendAndReturnSessionBeanLocal.createLendingRecord("S8900678A", "Anna Karenina", record1);
+                lendAndReturnSessionBeanLocal.createLendingRecord("S8900678A", "Madame Bovary", record2);
+                lendAndReturnSessionBeanLocal.createLendingRecord("S8900678A", "Hamlet", record3);
+                lendAndReturnSessionBeanLocal.createLendingRecord("S8581028X", "The Hobbit", record4);
+                lendAndReturnSessionBeanLocal.createLendingRecord("S8581028X", "Great Expectations", record5);
 
             } catch (MemberNotFoundException | BookNotFoundException | ParseException ex) {
                 System.out.println("Error");
