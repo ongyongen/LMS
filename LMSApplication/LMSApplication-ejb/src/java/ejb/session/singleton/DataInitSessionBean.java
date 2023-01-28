@@ -11,6 +11,9 @@ import entity.Member;
 import entity.Staff;
 import exception.BookNotFoundException;
 import exception.MemberNotFoundException;
+import java.text.Format;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -78,18 +81,24 @@ public class DataInitSessionBean {
                 memberSessionBeanLocal.createNewMember(member1);
                 memberSessionBeanLocal.createNewMember(member2);
                 
-                LendAndReturn record1 = new LendAndReturn(new Date());
-                LendAndReturn record2 = new LendAndReturn(new Date());
-                LendAndReturn record3 = new LendAndReturn(new Date());
-                LendAndReturn record4 = new LendAndReturn(new Date());
-                LendAndReturn record5 = new LendAndReturn(new Date());
                 
+                Format formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+                String dateString = formatter.format(new Date());
+                Date date =  new SimpleDateFormat("yyyy-MM-dd HH:mm").parse(dateString);  
+
+                LendAndReturn record1 = new LendAndReturn(date);
+                LendAndReturn record2 = new LendAndReturn(date);
+                LendAndReturn record3 = new LendAndReturn(date);
+                LendAndReturn record4 = new LendAndReturn(date);
+                LendAndReturn record5 = new LendAndReturn(date);
+
                 lendAndReturnSessionBeanLocal.createLendAndReturnRecord("S8900678A", "Anna Karenina", record1);
                 lendAndReturnSessionBeanLocal.createLendAndReturnRecord("S8900678A", "Madame Bovary", record2);
                 lendAndReturnSessionBeanLocal.createLendAndReturnRecord("S8900678A", "Hamlet", record3);
                 lendAndReturnSessionBeanLocal.createLendAndReturnRecord("S8581028X", "The Hobbit", record4);
+                lendAndReturnSessionBeanLocal.createLendAndReturnRecord("S8581028X", "Great Expectations", record5);
 
-            } catch (MemberNotFoundException | BookNotFoundException ex) {
+            } catch (MemberNotFoundException | BookNotFoundException | ParseException ex) {
                 System.out.println("Error");
             }
 
