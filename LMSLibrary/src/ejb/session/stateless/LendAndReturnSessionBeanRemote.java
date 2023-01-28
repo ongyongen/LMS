@@ -3,6 +3,7 @@ package ejb.session.stateless;
 
 import entity.LendAndReturn;
 import exception.BookNotFoundException;
+import exception.LendingNotFoundException;
 import exception.MemberNotFoundException;
 import javax.ejb.Remote;
 
@@ -14,5 +15,7 @@ import javax.ejb.Remote;
 public interface LendAndReturnSessionBeanRemote {
     
     public Long createLendAndReturnRecord(String memberIdentityNo, String bookTitle, LendAndReturn record) throws MemberNotFoundException, BookNotFoundException;
+    
+    public LendAndReturn retrieveLendingRecordByIdNoAndTitle(String idNo, String title) throws LendingNotFoundException, BookNotFoundException, MemberNotFoundException;
 
 }

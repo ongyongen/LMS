@@ -6,6 +6,7 @@ package ejb.session.stateless;
 
 import entity.LendAndReturn;
 import exception.BookNotFoundException;
+import exception.LendingNotFoundException;
 import exception.MemberNotFoundException;
 import javax.ejb.Local;
 
@@ -17,4 +18,6 @@ import javax.ejb.Local;
 public interface LendAndReturnSessionBeanLocal {
 
     public Long createLendAndReturnRecord(String memberIdentityNo, String bookTitle, LendAndReturn record) throws MemberNotFoundException, BookNotFoundException;    
+
+    public LendAndReturn retrieveLendingRecordByIdNoAndTitle(String idNo, String title) throws LendingNotFoundException, BookNotFoundException, MemberNotFoundException;
 }
